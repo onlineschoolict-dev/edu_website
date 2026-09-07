@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import AdminPanel from './components/AdminPanel'
 import Home from './pages/Home'
@@ -17,7 +17,7 @@ import { useLanguage } from './i18n'
 
 export default function App() {
   const { t } = useLanguage()
-  const { user, login, logout, isAdmin, authError } = useAuth()
+  const { user, login, logout, isAdmin, authError, loading: authLoading } = useAuth()
   const { courses, loading: coursesLoading, addCourse, updateCourse, deleteCourse } = useCourses()
   const myEnrollments = useMyEnrollments(user)
   const allEnrollments = useAllEnrollments(isAdmin)
@@ -86,6 +86,30 @@ export default function App() {
             path="/learn/:courseId"
             element={<Learn courses={courses} user={user} login={login} myEnrollments={myEnrollments} isAdmin={isAdmin} />}
           />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute loading={authLoading} user={user} isAdmin={isAdmin} login={login} authError={authError}>
+                <AdminPanel
+                  open
+                  onClose={() => window.history.back()}
+                  courses={courses}
+                  addCourse={addCourse}
+                  updateCourse={updateCourse}
+                  deleteCourse={deleteCourse}
+                  enrollments={allEnrollments}
+                  settings={settings}
+                  updateSettings={updateSettings}
+                  uploadHeroImage={uploadHeroImage}
+                  liveClasses={liveClasses}
+                  addLiveClass={addLiveClass}
+                  updateLiveClass={updateLiveClass}
+                  deleteLiveClass={deleteLiveClass}
+                  loading={coursesLoading}
+                />
+              </AdminRoute>
+            }
+          />
         </Routes>
       </main>
 
@@ -117,3 +141,30 @@ export default function App() {
     </>
   )
 }
+
+    function AdminRoute({ loading, user, isAdmin, login, authError, children }) {
+      const navigate = useNavigate()
+
+      if (loading) return <div className="admin-auth-loading" role="status">অ্যাডমিন অ্যাক্সেস যাচাই হচ্ছে...</div>
+
+      if (!user) {
+        return (
+          <div className="container section" style={{ maxWidth: 420, textAlign: 'center' }}>
+            <div className="note" style={{ marginBottom: 16 }}>অ্যাডমিন প্যানেলে যেতে Google দিয়ে লগইন করুন।</div>
+            {authError && <div className="note" style={{ marginBottom: 16 }}>Google login সম্পন্ন হয়নি। Firebase domain/provider settings চেক করুন।</div>}
+            <button className="btn btn-primary" onClick={login}>Google দিয়ে লগইন</button>
+          </div>
+        )
+      }
+
+      if (!isAdmin) {
+        return (
+          <div className="container section" style={{ maxWidth: 520, textAlign: 'center' }}>
+            <div className="note" style={{ marginBottom: 16 }}>এই account-এর Admin Panel access নেই।</div>
+            <button className="btn btn-outline" onClick={() => navigate('/')}>হোমে ফিরে যান</button>
+          </div>
+        )
+      }
+
+      return children
+    }
