@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import ClassroomCarousel from './ClassroomCarousel'
 
 const TYPING_PHRASES = [
   'ICT শিখুন সহজভাবে',
@@ -40,40 +41,45 @@ function useTypingEffect(phrases, { typeSpeed = 70, deleteSpeed = 35, pause = 14
   return text
 }
 
-export default function Hero({ image, overlay = 0.55 }) {
+export default function Hero({ image }) {
   const typed = useTypingEffect(TYPING_PHRASES)
 
-  const style = image
-    ? {
-        backgroundImage: `linear-gradient(180deg, rgba(8,10,16,${overlay}), rgba(8,10,16,${Math.min(overlay + 0.25, 0.92)})), url(${image})`
-      }
-    : {}
-
   return (
-    <div className={`hero ${image ? 'hero-with-image' : ''}`} style={style}>
+    <section className="hero">
       <div className="container">
-        <span className="hero-badge">HSC · SSC শিক্ষার্থীদের জন্য</span>
-        <h1 className="h1">ICT সহ সব বিষয় শিখুন, লাইভ ক্লাসে একসাথে</h1>
-        <p className="hero-typing">
-          {typed}<span className="typing-cursor">|</span>
-        </p>
-        <p className="body">
-          ভিডিও লেসন কিনুন, নির্দিষ্ট সময়ে লাইভ ক্লাসে যোগ দিন, ক্লাস শেষ হলেও রেকর্ডিং দেখে রিভিশন দিন।
-        </p>
-        <div className="hero-actions">
-          <a href="#courses" className="btn btn-primary">কোর্স ব্রাউজ করুন</a>
-          <a href="#courses" className="btn btn-outline">আমার কোর্স দেখুন</a>
-        </div>
-
-        <div className="hero-stats">
-          {STATS.map(s => (
-            <div className="hero-stat" key={s.label}>
-              <span className="hero-stat-value">{s.value}</span>
-              <span className="hero-stat-label">{s.label}</span>
+        <div className="hero-intro">
+          <div className="hero-copy">
+            <span className="hero-badge">ONLINE SCHOOL · LEARN WITH PURPOSE</span>
+            <p className="hero-kicker">Quality Education for a Brighter Future</p>
+            <h1 className="h1">Learn Today,<br /><span>Build Tomorrow</span></h1>
+            <p className="hero-typing">{typed}<span className="typing-cursor">|</span></p>
+            <p className="body">Learn from experienced teachers, access quality courses, and build the skills you need for a brighter future.</p>
+            <div className="hero-actions">
+              <a href="#courses" className="btn btn-primary">Explore Courses <span aria-hidden="true">↗</span></a>
+              <a href="#contact" className="btn btn-outline">Contact Us</a>
             </div>
-          ))}
+            <div className="hero-stats">
+              {STATS.map(s => (
+                <div className="hero-stat" key={s.label}>
+                  <span className="hero-stat-value">{s.value}</span>
+                  <span className="hero-stat-label">{s.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="teacher-feature" id="teachers">
+            <div className="teacher-glow" />
+            <div className="teacher-frame">
+              <img src="/images/teacher.png" alt="Online School teacher" width="1024" height="1024" />
+            </div>
+            <div className="teacher-card">
+              <span className="teacher-card-mark">✦</span>
+              <div><strong>Learn from a mentor</strong><small>Guidance that stays with you</small></div>
+            </div>
+          </div>
         </div>
+        <div id="gallery"><ClassroomCarousel customImage={image} /></div>
       </div>
-    </div>
+    </section>
   )
 }

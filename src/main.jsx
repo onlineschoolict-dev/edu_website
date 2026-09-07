@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import App from './App.jsx'
-import AdminApp from './AdminApp.jsx'
 import ConfigCheck, { getMissingFirebaseVars } from './components/ConfigCheck.jsx'
 import './index.css'
+
+const App = lazy(() => import('./App.jsx'))
+const AdminApp = lazy(() => import('./AdminApp.jsx'))
 
 // Set VITE_APP_MODE=admin in a second Vercel project's environment variables
 // to deploy this same codebase as a separate admin-only site (e.g.
@@ -22,7 +23,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ConfigCheck missing={missingVars} />
     ) : (
       <BrowserRouter>
-        {isAdminMode ? <AdminApp /> : <App />}
+        <Suspense fallback={<div className="app-loading" aria-label="Loading" />}>
+          {isAdminMode ? <AdminApp /> : <App />}
+        </Suspense>
       </BrowserRouter>
     )}
   </React.StrictMode>

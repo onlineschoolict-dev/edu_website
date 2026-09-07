@@ -46,6 +46,14 @@ export default function Home({ courses, coursesLoading = false, settings, liveCl
         <CourseGrid courses={publishedCourses} filter={filter} loading={coursesLoading} />
       </div>
       <Testimonials testimonials={settings?.testimonials || []} />
+      <section className="container section closing-cta" id="contact">
+        <div>
+          <span className="eyebrow">READY WHEN YOU ARE</span>
+          <h2 className="h2">Your next chapter starts here.</h2>
+          <p className="body">Explore the courses, meet your teachers, and build skills that stay useful long after class ends.</p>
+        </div>
+        <a href="#courses" className="btn btn-primary">Start Learning <span aria-hidden="true">↗</span></a>
+      </section>
     </>
   )
 }

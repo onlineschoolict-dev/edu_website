@@ -1,14 +1,15 @@
 const FEATURES = [
-  { icon: '🔴', title: 'লাইভ ক্লাস', desc: 'নির্দিষ্ট সময়ে শিক্ষকের সাথে সরাসরি ক্লাসে যোগ দিন, প্রশ্ন করুন সাথে সাথে।' },
-  { icon: '🔁', title: 'সারাজীবন রেকর্ডিং অ্যাক্সেস', desc: 'লাইভ ক্লাস মিস করলেও চিন্তা নেই — একই ভিডিওতে পরে রিভিশন দিতে পারবেন।' },
-  { icon: '🔒', title: 'নিরাপদ পেমেন্ট যাচাই', desc: 'bKash/Nagad দিয়ে পেমেন্ট করে অ্যাডমিন অনুমোদনের পর কোর্স আনলক হয়।' }
+  { icon: '✦', title: 'Expert Teachers', desc: 'Learn from mentors who make complex ideas clear, practical, and memorable.' },
+  { icon: '▣', title: 'Quality Education', desc: 'Structured lessons and carefully selected courses built around real progress.' },
+  { icon: '↗', title: 'Flexible Learning', desc: 'Study live, revisit recordings, and keep learning at a pace that works for you.' },
+  { icon: '◌', title: '24/7 Support', desc: 'Get the guidance and community support you need beyond the classroom.' }
 ]
 
 export default function Features() {
   return (
-    <div className="container section">
+    <div className="container section" id="about">
       <div className="section-head">
-        <h2 className="h2" style={{ fontSize: 26 }}>কেন আমাদের কাছে পড়বেন</h2>
+        <div><span className="eyebrow">A BETTER WAY TO LEARN</span><h2 className="h2" style={{ fontSize: 26, marginTop: 8 }}>Everything you need to move forward</h2></div>
       </div>
       <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
         {FEATURES.map(f => (

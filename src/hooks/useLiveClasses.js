@@ -16,7 +16,7 @@ export function useLiveClasses() {
     const unsub = onSnapshot(q, (snap) => {
       setLiveClasses(snap.docs.map(d => ({ id: d.id, ...d.data() })))
       setLoading(false)
-    })
+    }, () => setLoading(false))
     return unsub
   }, [])
 

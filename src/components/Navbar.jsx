@@ -19,7 +19,15 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
       <div className="container navbar-inner">
         <div className="brand">
           <span className="brand-dot" />
-          {siteName || 'কোচিং সেন্টার'}
+          {siteName || 'Online School'}
+        </div>
+
+        <div className="nav-links desktop-only" aria-label="Site sections">
+          <a href="#about">About</a>
+          <a href="#courses">Courses</a>
+          <a href="#teachers">Teachers</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#contact">Contact</a>
         </div>
 
         {/* Search - desktop */}

@@ -6,7 +6,7 @@ import { uploadImage } from '../utils/storage'
 const DOC = doc(db, 'settings', 'site')
 
 const DEFAULTS = {
-  siteName: 'কোচিং সেন্টার',
+  siteName: 'Online School',
   heroImage: '',
   heroOverlay: 0.55, // 0 = no dark overlay, 1 = fully dark
   onlinePaymentEnabled: false,
@@ -21,7 +21,7 @@ export function useSiteSettings() {
     const unsub = onSnapshot(DOC, (snap) => {
       setSettings(snap.exists() ? { ...DEFAULTS, ...snap.data() } : DEFAULTS)
       setLoading(false)
-    })
+    }, () => setLoading(false))
     return unsub
   }, [])
 

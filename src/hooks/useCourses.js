@@ -14,7 +14,7 @@ export function useCourses() {
     const unsub = onSnapshot(collection(db, COL), (snap) => {
       setCourses(snap.docs.map(d => ({ id: d.id, ...d.data() })))
       setLoading(false)
-    })
+    }, () => setLoading(false))
     return unsub
   }, [])
 
