@@ -4,7 +4,7 @@ rules_version = '2';
 // Firebase Auth verifies the email on Google sign-in, so a student cannot
 // spoof this value from the client.
 function isAdmin() {
-  return request.auth != null && request.auth.token.email == 'lovechristine167@gmail.com';
+  return request.auth != null && request.auth.token.email == 'onlineschoolict@gmail.com';
 }
 
 service cloud.firestore {
