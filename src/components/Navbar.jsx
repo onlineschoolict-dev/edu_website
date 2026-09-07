@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n'
 
-export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, siteName, theme, toggleTheme, courses = [] }) {
+export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, siteName, theme, toggleTheme, courses = [], authError }) {
   const { language, setLanguage, t, localized } = useLanguage()
   const [menuOpen, setMenuOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -15,6 +15,13 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
   }, [query, courses, localized])
 
   const ThemeIcon = theme === 'dark' ? SunIcon : MoonIcon
+  const authMessage = authError?.code === 'auth/unauthorized-domain'
+    ? (language === 'bn' ? 'এই ওয়েবসাইটের domain Firebase Authorized Domains-এ যোগ করুন।' : 'Add this website domain to Firebase Authorized Domains.')
+    : authError?.code === 'auth/operation-not-allowed'
+      ? (language === 'bn' ? 'Firebase Console-এ Google sign-in চালু করুন।' : 'Enable Google sign-in in Firebase Console.')
+      : authError?.code === 'auth/popup-blocked'
+        ? (language === 'bn' ? 'Login popup blocked হয়েছে। আবার চেষ্টা করুন।' : 'The login popup was blocked. Please try again.')
+        : (language === 'bn' ? 'Google login করা যায়নি। আবার চেষ্টা করুন।' : 'Google sign-in failed. Please try again.')
 
   return (
     <nav className="navbar" aria-label={t('home')}>
@@ -95,6 +102,7 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
           </button>
         </div>
       </div>
+      {authError && <div className="auth-error" role="alert">{authMessage}</div>}
 
       {/* Mobile dropdown */}
       {menuOpen && (

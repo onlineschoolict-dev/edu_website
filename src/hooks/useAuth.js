@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
+import { getRedirectResult, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth'
 import { auth, googleProvider, ADMIN_EMAIL } from '../firebase'
 
 export function useAuth() {
@@ -8,6 +8,12 @@ export function useAuth() {
   const [authError, setAuthError] = useState(null)
 
   useEffect(() => {
+    getRedirectResult(auth).catch((error) => {
+      if (error?.code !== 'auth/no-auth-event') {
+        console.error('[Firebase Auth] Redirect sign-in failed', error)
+        setAuthError(error)
+      }
+    })
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u)
       setLoading(false)
@@ -53,6 +59,11 @@ export function useAuth() {
         console.error(`[Firebase Auth] Google sign-in failed: ${code}`, error)
       } else {
         console.error('[Firebase Auth] Google sign-in failed', error)
+      }
+
+      if (code === 'auth/popup-blocked') {
+        console.info('[Firebase Auth] Popup blocked; starting redirect sign-in.')
+        return signInWithRedirect(auth, googleProvider)
       }
 
       setAuthError(error)

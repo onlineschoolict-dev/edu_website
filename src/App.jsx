@@ -17,7 +17,7 @@ import { useLanguage } from './i18n'
 
 export default function App() {
   const { t } = useLanguage()
-  const { user, login, logout, isAdmin } = useAuth()
+  const { user, login, logout, isAdmin, authError } = useAuth()
   const { courses, loading: coursesLoading, addCourse, updateCourse, deleteCourse } = useCourses()
   const myEnrollments = useMyEnrollments(user)
   const allEnrollments = useAllEnrollments(isAdmin)
@@ -54,6 +54,7 @@ export default function App() {
         user={user}
         isAdmin={isAdmin}
         login={login}
+        authError={authError}
         logout={logout}
         onOpenAdmin={() => setAdminOpen(true)}
         siteName={settings.siteName}

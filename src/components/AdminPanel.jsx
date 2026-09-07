@@ -6,6 +6,7 @@ import LiveClassManager from './admin/LiveClassManager'
 import TestimonialsEditor from './admin/TestimonialsEditor'
 import AdvertisementManager from './admin/AdvertisementManager'
 import { useLanguage } from '../i18n'
+import '../admin.css'
 
 const EMPTY = {
   title: '', titleBn: '', titleEn: '', subject: 'ICT', thumb: '', poster: '', oldprice: '', price: '',
