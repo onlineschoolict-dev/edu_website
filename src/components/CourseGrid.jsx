@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../i18n'
 
 const SUBJECT_ICON = { ICT: '💻', 'পদার্থবিজ্ঞান': '⚛️', 'রসায়ন': '🧪', 'গণিত': '📐', 'ইংরেজি': '📖' }
 
@@ -8,6 +9,7 @@ function discountPct(c) {
 }
 
 function CourseCard({ course }) {
+  const { localized, t } = useLanguage()
   const pct = discountPct(course)
   return (
     <Link to={`/course/${course.id}`} className="card course-card" style={{ display: 'flex' }}>
@@ -26,17 +28,17 @@ function CourseCard({ course }) {
         </div>
       </div>
       <span className="body" style={{ fontSize: 13 }}>{course.subject}</span>
-      <h3 className="h3">{course.title}</h3>
-      <p className="body" style={{ fontSize: 13 }}>{course.desc}</p>
+      <h3 className="h3">{localized(course, 'title')}</h3>
+      <p className="body" style={{ fontSize: 13 }}>{localized(course, 'desc')}</p>
       <div className="meta-row">
-        <span>{course.lessons || 0} ক্লাস</span>
+        <span>{course.lessons || 0} {t('lessons')}</span>
         <span>{course.duration}</span>
       </div>
       <div className="price-row">
         {course.oldprice ? <span className="price-old">৳{course.oldprice}</span> : null}
         <span className="price-new">৳{course.price}</span>
       </div>
-      <span className="btn btn-primary" style={{ textAlign: 'center' }}>বিস্তারিত দেখুন</span>
+      <span className="btn btn-primary" style={{ textAlign: 'center' }}>{t('courseDetails')}</span>
     </Link>
   )
 }

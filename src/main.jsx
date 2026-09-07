@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import ConfigCheck, { getMissingFirebaseVars } from './components/ConfigCheck.jsx'
+import { LanguageProvider } from './i18n.jsx'
 import './index.css'
 
 const App = lazy(() => import('./App.jsx'))
@@ -19,14 +20,16 @@ const missingVars = getMissingFirebaseVars()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {missingVars.length > 0 ? (
-      <ConfigCheck missing={missingVars} />
-    ) : (
-      <BrowserRouter>
-        <Suspense fallback={<div className="app-loading" aria-label="Loading" />}>
-          {isAdminMode ? <AdminApp /> : <App />}
-        </Suspense>
-      </BrowserRouter>
-    )}
+    <LanguageProvider>
+      {missingVars.length > 0 ? (
+        <ConfigCheck missing={missingVars} />
+      ) : (
+        <BrowserRouter>
+          <Suspense fallback={<div className="app-loading" aria-label="Loading" />}>
+            {isAdminMode ? <AdminApp /> : <App />}
+          </Suspense>
+        </BrowserRouter>
+      )}
+    </LanguageProvider>
   </React.StrictMode>
 )

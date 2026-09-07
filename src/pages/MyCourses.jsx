@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useCurriculum } from '../hooks/useCurriculum'
 import { useProgress } from '../hooks/useProgress'
+import AdBanner from '../components/AdBanner'
+import { useLanguage } from '../i18n'
 
-function MyCourseCard({ course, user }) {
+function MyCourseCard({ course, user, localized, t }) {
   const { totalLessons } = useCurriculum(course.id)
   const { completedLessonIds } = useProgress(user, course.id)
   const pct = totalLessons > 0 ? Math.round((completedLessonIds.length / totalLessons) * 100) : 0
@@ -13,25 +15,26 @@ function MyCourseCard({ course, user }) {
         {!course.thumb && '📚'}
       </div>
       <span className="body" style={{ fontSize: 13 }}>{course.subject}</span>
-      <h3 className="h3">{course.title}</h3>
+      <h3 className="h3">{localized(course, 'title')}</h3>
       {totalLessons > 0 ? (
         <>
           <div className="learn-progress-bar">
             <div className="learn-progress-fill" style={{ width: `${pct}%` }} />
           </div>
           <span className="body" style={{ fontSize: 13 }}>
-            {completedLessonIds.length} / {totalLessons} লেসন সম্পন্ন · {pct}%
+            {completedLessonIds.length} / {totalLessons} {t('lessons')} · {pct}%
           </span>
         </>
       ) : (
-        <span className="body" style={{ fontSize: 13 }}>এখনো লেসন যোগ করা হয়নি</span>
+        <span className="body" style={{ fontSize: 13 }}>{t('noLessons')}</span>
       )}
       <span className="btn btn-primary" style={{ textAlign: 'center', marginTop: 'auto' }}>শেখা শুরু করুন</span>
     </Link>
   )
 }
 
-export default function MyCourses({ courses, user, myEnrollments, login }) {
+export default function MyCourses({ courses, user, myEnrollments, login, advertisements = [], adsEnabled = true }) {
+  const { t, localized } = useLanguage()
   if (!user) {
     return (
       <div className="container section">
@@ -62,9 +65,10 @@ export default function MyCourses({ courses, user, myEnrollments, login }) {
         </div>
       ) : (
         <div className="grid">
-          {myCourses.map(c => <MyCourseCard key={c.id} course={c} user={user} />)}
+          {myCourses.map(c => <MyCourseCard key={c.id} course={c} user={user} localized={localized} t={t} />)}
         </div>
       )}
+      <AdBanner ads={advertisements} adsEnabled={adsEnabled} position="dashboard" />
     </div>
   )
 }

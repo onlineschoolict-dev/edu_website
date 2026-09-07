@@ -12,8 +12,11 @@ import { useMyEnrollments, useAllEnrollments } from './hooks/useEnrollments'
 import { useSiteSettings } from './hooks/useSiteSettings'
 import { useTheme } from './hooks/useTheme'
 import { useLiveClasses } from './hooks/useLiveClasses'
+import AdBanner from './components/AdBanner'
+import { useLanguage } from './i18n'
 
 export default function App() {
+  const { t } = useLanguage()
   const { user, login, logout, isAdmin } = useAuth()
   const { courses, loading: coursesLoading, addCourse, updateCourse, deleteCourse } = useCourses()
   const myEnrollments = useMyEnrollments(user)
@@ -60,6 +63,7 @@ export default function App() {
       />
 
       <main>
+        <AdBanner ads={settings.advertisements} adsEnabled={settings.adsEnabled !== false} position="homepage" />
         <Routes>
           <Route path="/" element={<Home courses={courses} coursesLoading={coursesLoading} settings={settings} liveClasses={liveClasses} />} />
           <Route
@@ -71,10 +75,12 @@ export default function App() {
                 login={login}
                 myEnrollments={myEnrollments}
                 onlinePaymentEnabled={settings.onlinePaymentEnabled}
+                advertisements={settings.advertisements}
+                adsEnabled={settings.adsEnabled !== false}
               />
             }
           />
-          <Route path="/my-courses" element={<MyCourses courses={courses} user={user} myEnrollments={myEnrollments} login={login} />} />
+          <Route path="/my-courses" element={<MyCourses courses={courses} user={user} myEnrollments={myEnrollments} login={login} advertisements={settings.advertisements} adsEnabled={settings.adsEnabled !== false} />} />
           <Route
             path="/learn/:courseId"
             element={<Learn courses={courses} user={user} login={login} myEnrollments={myEnrollments} isAdmin={isAdmin} />}
@@ -85,7 +91,7 @@ export default function App() {
       <footer>
         <div className="container footer-inner">
           <span>© {settings.siteName}</span>
-          {isAdmin && <button className="link-btn" onClick={() => setAdminOpen(true)}>অ্যাডমিন প্যানেল</button>}
+          {isAdmin && <button className="link-btn" onClick={() => setAdminOpen(true)}>{t('admin')}</button>}
         </div>
       </footer>
 

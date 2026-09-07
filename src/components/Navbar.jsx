@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../i18n'
 
 export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, siteName, theme, toggleTheme, courses = [] }) {
+  const { language, setLanguage, t, localized } = useLanguage()
   const [menuOpen, setMenuOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
@@ -9,13 +11,13 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return []
-    return courses.filter(c => c.title?.toLowerCase().includes(q) || c.subject?.toLowerCase().includes(q)).slice(0, 6)
-  }, [query, courses])
+    return courses.filter(c => `${localized(c, 'title')} ${c.subject || ''}`.toLowerCase().includes(q)).slice(0, 6)
+  }, [query, courses, localized])
 
   const ThemeIcon = theme === 'dark' ? SunIcon : MoonIcon
 
   return (
-    <nav className="navbar" aria-label="প্রধান নেভিগেশন">
+    <nav className="navbar" aria-label={t('home')}>
       <div className="container navbar-inner">
         <div className="brand">
           <span className="brand-dot" />
@@ -23,11 +25,11 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
         </div>
 
         <div className="nav-links desktop-only" aria-label="Site sections">
-          <a href="#about">About</a>
-          <a href="#courses">Courses</a>
-          <a href="#teachers">Teachers</a>
-          <a href="#gallery">Gallery</a>
-          <a href="#contact">Contact</a>
+          <a href="#about">{t('home')}</a>
+          <a href="#courses">{t('courses')}</a>
+          <a href="#teachers">{t('teachers')}</a>
+          <a href="#gallery">{t('gallery')}</a>
+          <a href="#contact">{t('contact')}</a>
         </div>
 
         {/* Search - desktop */}
@@ -35,8 +37,8 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
           <input
             className="input search-input"
             type="search"
-            aria-label="কোর্স খুঁজুন"
-            placeholder="কোর্স খুঁজুন..."
+            aria-label={t('searchCourses')}
+            placeholder={t('searchCourses')}
             value={query}
             onChange={e => setQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
@@ -46,7 +48,7 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
             <div className="search-results">
               {results.map(c => (
                 <Link key={c.id} to={`/course/${c.id}`} className="search-result-item" onClick={() => setQuery('')}>
-                  <span>{c.title}</span>
+                  <span>{localized(c, 'title')}</span>
                   <small>{c.subject}</small>
                 </Link>
               ))}
@@ -56,20 +58,25 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
 
         {/* Desktop actions */}
         <div className="navbar-actions desktop-only">
+          <div className="language-switcher" aria-label={t('language')}>
+            <button className={language === 'bn' ? 'active' : ''} onClick={() => setLanguage('bn')}>বাংলা</button>
+            <span>|</span>
+            <button className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>English</button>
+          </div>
           <button className="theme-toggle" aria-label="থিম পরিবর্তন করুন" onClick={toggleTheme}>
             <ThemeIcon />
           </button>
           {isAdmin && (
-            <button className="btn btn-outline" onClick={onOpenAdmin}>অ্যাডমিন প্যানেল</button>
+            <button className="btn btn-outline" onClick={onOpenAdmin}>{t('admin')}</button>
           )}
           {user ? (
             <>
-              <Link to="/my-courses" className="btn btn-outline">আমার কোর্স</Link>
+              <Link to="/my-courses" className="btn btn-outline">{t('myCourses')}</Link>
               <span className="body" style={{ fontSize: 13 }}>{user.displayName || user.email}</span>
-              <button className="btn btn-outline" onClick={logout}>লগআউট</button>
+              <button className="btn btn-outline" onClick={logout}>{t('logout')}</button>
             </>
           ) : (
-            <button className="btn btn-primary" onClick={login}>Google দিয়ে লগইন</button>
+            <button className="btn btn-primary" onClick={login}>{t('login')}</button>
           )}
         </div>
 
@@ -78,6 +85,11 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
           <button className="theme-toggle" aria-label="থিম পরিবর্তন করুন" onClick={toggleTheme}>
             <ThemeIcon />
           </button>
+          <div className="language-switcher mobile-language-switcher" aria-label={t('language')}>
+            <button className={language === 'bn' ? 'active' : ''} onClick={() => setLanguage('bn')}>বাংলা</button>
+            <span>|</span>
+            <button className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>EN</button>
+          </div>
           <button className="menu-toggle" aria-label="মেনু খুলুন" onClick={() => setMenuOpen(o => !o)}>
             <span /><span /><span />
           </button>
@@ -90,9 +102,9 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
           <input
             className="input"
             type="search"
-            aria-label="কোর্স খুঁজুন"
+            aria-label={t('searchCourses')}
             style={{ marginBottom: 12 }}
-            placeholder="কোর্স খুঁজুন..."
+            placeholder={t('searchCourses')}
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
@@ -100,7 +112,7 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
             <div className="search-results search-results-mobile">
               {results.map(c => (
                 <Link key={c.id} to={`/course/${c.id}`} className="search-result-item" onClick={() => { setQuery(''); setMenuOpen(false) }}>
-                  <span>{c.title}</span>
+                  <span>{localized(c, 'title')}</span>
                   <small>{c.subject}</small>
                 </Link>
               ))}
@@ -108,18 +120,18 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
           )}
           {isAdmin && (
             <button className="btn btn-outline" style={{ width: '100%', marginBottom: 8 }} onClick={() => { onOpenAdmin(); setMenuOpen(false) }}>
-              অ্যাডমিন প্যানেল
+              {t('admin')}
             </button>
           )}
           {user ? (
             <>
-              <Link to="/my-courses" className="btn btn-outline" style={{ width: '100%', marginBottom: 8, display: 'block', textAlign: 'center' }} onClick={() => setMenuOpen(false)}>আমার কোর্স</Link>
+              <Link to="/my-courses" className="btn btn-outline" style={{ width: '100%', marginBottom: 8, display: 'block', textAlign: 'center' }} onClick={() => setMenuOpen(false)}>{t('myCourses')}</Link>
               <span className="body" style={{ fontSize: 13, display: 'block', margin: '10px 0' }}>{user.displayName || user.email}</span>
-              <button className="btn btn-outline" style={{ width: '100%' }} onClick={() => { logout(); setMenuOpen(false) }}>লগআউট</button>
+              <button className="btn btn-outline" style={{ width: '100%' }} onClick={() => { logout(); setMenuOpen(false) }}>{t('logout')}</button>
             </>
           ) : (
             <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => { login(); setMenuOpen(false) }}>
-              Google দিয়ে লগইন
+              {t('login')}
             </button>
           )}
         </div>

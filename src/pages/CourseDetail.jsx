@@ -3,8 +3,11 @@ import { useParams, Link } from 'react-router-dom'
 import { requestEnrollment } from '../hooks/useEnrollments'
 import { useCurriculum } from '../hooks/useCurriculum'
 import CourseCurriculumPreview from '../components/CourseCurriculumPreview'
+import AdBanner from '../components/AdBanner'
+import { useLanguage } from '../i18n'
 
-export default function CourseDetail({ courses, user, login, myEnrollments, onlinePaymentEnabled }) {
+export default function CourseDetail({ courses, user, login, myEnrollments, onlinePaymentEnabled, advertisements = [], adsEnabled = true }) {
+  const { t, localized } = useLanguage()
   const { id } = useParams()
   const course = courses.find(c => c.id === id)
   const { modules, totalLessons } = useCurriculum(id)
@@ -54,6 +57,7 @@ export default function CourseDetail({ courses, user, login, myEnrollments, onli
   }
 
   const enrollment = myEnrollments.find(e => e.courseId === course.id)
+  const demoLessons = modules.flatMap(module => module.lessons.filter(lesson => lesson.isDemo === true))
 
   const submit = async () => {
     if (!user) { login(); return }
@@ -71,6 +75,7 @@ export default function CourseDetail({ courses, user, login, myEnrollments, onli
 
   return (
     <div className="container section" style={{ maxWidth: 760 }}>
+      <AdBanner ads={advertisements} adsEnabled={adsEnabled} position="course" />
       <Link to="/" className="body" style={{ fontSize: 13, display: 'inline-block', marginBottom: 20 }}>← সব কোর্সে ফিরে যান</Link>
 
       {course.poster && (
@@ -78,8 +83,8 @@ export default function CourseDetail({ courses, user, login, myEnrollments, onli
       )}
 
       <span className="body" style={{ fontSize: 13 }}>{course.subject}</span>
-      <h1 className="h2" style={{ margin: '8px 0 12px' }}>{course.title}</h1>
-      <p className="body" style={{ marginBottom: 20 }}>{course.desc}</p>
+      <h1 className="h2" style={{ margin: '8px 0 12px' }}>{localized(course, 'title')}</h1>
+      <p className="body" style={{ marginBottom: 20 }}>{localized(course, 'desc')}</p>
       <div className="meta-row" style={{ marginBottom: 24, flexWrap: 'wrap' }}>
         <span>{modules.length > 0 ? `${modules.length} মডিউল` : `${course.lessons || 0} ক্লাস`}</span>
         {modules.length > 0 && <span>{totalLessons} লেসন</span>}
@@ -102,8 +107,18 @@ export default function CourseDetail({ courses, user, login, myEnrollments, onli
       {modules.length > 0 && (
         <>
           <h3 className="h3" style={{ marginBottom: 12 }}>কারিকুলাম</h3>
-          <CourseCurriculumPreview modules={modules} unlocked={enrollment?.status === 'approved'} />
+          <CourseCurriculumPreview courseId={course.id} modules={modules} unlocked={enrollment?.status === 'approved'} />
         </>
+      )}
+
+      {demoLessons.length > 0 && (
+        <section className="demo-section card">
+          <span className="pill">🎁 {t('freeDemo')}</span>
+          <h3 className="h3">{t('freeDemo')}</h3>
+          <div className="demo-list">
+            {demoLessons.map(lesson => <Link key={lesson.id} to={`/learn/${course.id}?lesson=${lesson.id}`} className="demo-item"><span>▶</span>{localized(lesson, 'title')}</Link>)}
+          </div>
+        </section>
       )}
 
       {enrollment?.status === 'approved' ? (

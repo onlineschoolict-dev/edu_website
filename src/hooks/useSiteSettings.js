@@ -10,7 +10,9 @@ const DEFAULTS = {
   heroImage: '',
   heroOverlay: 0.55, // 0 = no dark overlay, 1 = fully dark
   onlinePaymentEnabled: false,
-  testimonials: []
+  adsEnabled: true,
+  testimonials: [],
+  advertisements: []
 }
 
 export function useSiteSettings() {

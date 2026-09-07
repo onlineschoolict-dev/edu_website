@@ -8,7 +8,7 @@ import { db } from '../firebase'
 // Firestore shape:
 // courses/{courseId}/modules/{moduleId}            { title, order }
 // courses/{courseId}/modules/{moduleId}/lessons/{lessonId}
-//                                                   { title, youtubeUrl, description, order, duration }
+//                                                   { title, youtubeId, description, order, duration }
 
 function modulesCol(courseId) {
   return collection(db, 'courses', courseId, 'modules')

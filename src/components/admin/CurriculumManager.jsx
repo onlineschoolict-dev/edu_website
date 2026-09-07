@@ -6,26 +6,39 @@ import {
 } from '../../hooks/useCurriculum'
 import { extractYouTubeId, buildYouTubeEmbedUrl } from '../../utils/youtube'
 
-const EMPTY_LESSON = { title: '', videoType: 'youtube', youtubeUrl: '', facebookUrl: '', description: '', duration: '' }
+const EMPTY_LESSON = { title: '', videoType: 'youtube', youtubeId: '', facebookUrl: '', description: '', duration: '', isDemo: false }
 
 function LessonForm({ courseId, moduleId, initial, onDone }) {
-  const [form, setForm] = useState(initial ? { ...EMPTY_LESSON, ...initial } : EMPTY_LESSON)
+  const [form, setForm] = useState(() => ({
+    ...EMPTY_LESSON,
+    ...initial,
+    youtubeId: extractYouTubeId(initial?.youtubeId || initial?.youtubeUrl) || ''
+  }))
   const [order] = useState(initial?.order)
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
   const isFacebook = form.videoType === 'facebook'
-  const previewId = !isFacebook ? extractYouTubeId(form.youtubeUrl) : null
+  const previewId = !isFacebook ? extractYouTubeId(form.youtubeId) : null
 
   const save = async () => {
     if (!form.title.trim()) { alert('লেসনের নাম দিন।'); return }
     if (isFacebook) {
       if (!form.facebookUrl.trim()) { alert('Facebook ভিডিও/লাইভের লিংক দিন।'); return }
-    } else if (!extractYouTubeId(form.youtubeUrl)) {
+    } else if (!extractYouTubeId(form.youtubeId)) {
       alert('সঠিক YouTube URL বা ভিডিও আইডি দিন।'); return
     }
+    const lessonData = {
+      title: form.title,
+      videoType: form.videoType,
+      youtubeId: isFacebook ? '' : extractYouTubeId(form.youtubeId),
+      facebookUrl: isFacebook ? form.facebookUrl : '',
+      description: form.description,
+      duration: form.duration,
+      order: order ?? 0
+    }
     if (initial?.id) {
-      await updateLesson(courseId, moduleId, initial.id, { ...form, order: order ?? 0 })
+      await updateLesson(courseId, moduleId, initial.id, lessonData)
     } else {
-      await addLesson(courseId, moduleId, { ...form, order: Date.now() })
+      await addLesson(courseId, moduleId, { ...lessonData, order: Date.now() })
     }
     onDone()
   }
@@ -43,18 +56,24 @@ function LessonForm({ courseId, moduleId, initial, onDone }) {
         <div className="field"><label>Facebook ভিডিও/লাইভ URL</label>
           <input className="input" value={form.facebookUrl} onChange={e => set('facebookUrl', e.target.value)} placeholder="https://www.facebook.com/.../videos/..." /></div>
       ) : (
-        <div className="field"><label>YouTube URL (watch / youtu.be / live)</label>
-          <input className="input" value={form.youtubeUrl} onChange={e => set('youtubeUrl', e.target.value)} placeholder="https://youtu.be/..." /></div>
+        <div className="field"><label>YouTube ভিডিও ID বা URL</label>
+          <input className="input" value={form.youtubeId} onChange={e => set('youtubeId', e.target.value)} placeholder="ভিডিও ID অথবা YouTube URL পেস্ট করুন" /></div>
       )}
       {previewId && (
         <div className="video-wrap" style={{ maxWidth: 320 }}>
-          <iframe src={buildYouTubeEmbedUrl(previewId)} allowFullScreen title="preview" />
+          <iframe
+            src={buildYouTubeEmbedUrl(previewId)}
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="preview"
+          />
         </div>
       )}
       <div className="field"><label>বিবরণ (ঐচ্ছিক)</label>
         <input className="input" value={form.description} onChange={e => set('description', e.target.value)} /></div>
       <div className="field"><label>স্থিতিকাল (ঐচ্ছিক, যেমন 12:30)</label>
         <input className="input" value={form.duration} onChange={e => set('duration', e.target.value)} /></div>
+      <label className="admin-check-row"><input type="checkbox" checked={form.isDemo === true} onChange={e => set('isDemo', e.target.checked)} /> ফ্রি ডেমো ক্লাস হিসেবে দেখান</label>
       <div style={{ display: 'flex', gap: 8 }}>
         <button className="btn btn-primary" onClick={save}>সেভ</button>
         <button className="btn btn-outline" onClick={onDone}>বাতিল</button>

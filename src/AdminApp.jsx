@@ -10,18 +10,21 @@ import { useSiteSettings } from './hooks/useSiteSettings'
 import { useLiveClasses } from './hooks/useLiveClasses'
 
 export default function AdminApp() {
-  const { user, login, logout, isAdmin, loading } = useAuth()
-  const { courses, addCourse, updateCourse, deleteCourse } = useCourses()
+  const { user, login, logout, isAdmin, loading, authError } = useAuth()
+  const { courses, addCourse, updateCourse, deleteCourse, loading: coursesLoading } = useCourses()
   const allEnrollments = useAllEnrollments(isAdmin)
   const { settings, updateSettings, uploadHeroImage } = useSiteSettings()
   const { liveClasses, addLiveClass, updateLiveClass, deleteLiveClass } = useLiveClasses()
 
-  if (loading) return null
+  if (loading) {
+    return <div className="admin-auth-loading" role="status">অ্যাডমিন প্যানেল লোড হচ্ছে...</div>
+  }
 
   if (!user) {
     return (
       <div className="container section" style={{ maxWidth: 420, textAlign: 'center' }}>
         <h1 className="h2" style={{ marginBottom: 20 }}>Admin Login</h1>
+        {authError && <div className="note" style={{ marginBottom: 16 }}>লগইন করা যায়নি। Google login, authorized domain এবং popup settings চেক করুন।</div>}
         <button className="btn btn-primary" style={{ width: '100%', padding: 12 }} onClick={login}>
           Google দিয়ে লগইন
         </button>
@@ -57,6 +60,7 @@ export default function AdminApp() {
         addLiveClass={addLiveClass}
         updateLiveClass={updateLiveClass}
         deleteLiveClass={deleteLiveClass}
+        loading={coursesLoading}
       />
     </div>
   )

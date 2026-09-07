@@ -3,8 +3,8 @@
 // official public embed (plugins/video.php), which works for public videos
 // that the page owner has allowed to be embedded. If a video isn't
 // embeddable, the iframe will simply show Facebook's own "content
-// unavailable" message - we always render a real "Watch on Facebook" link
-// alongside the embed so the student can still reach the video.
+// unavailable" message. The lesson page intentionally does not add an
+// external link from the protected course player.
 
 export function isFacebookUrl(input) {
   if (!input) return false

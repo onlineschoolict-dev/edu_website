@@ -3,8 +3,11 @@ import { useParams, useSearchParams, Link } from 'react-router-dom'
 import { useCurriculum } from '../hooks/useCurriculum'
 import { useProgress } from '../hooks/useProgress'
 import VideoEmbed from '../components/VideoEmbed'
+import { extractYouTubeId } from '../utils/youtube'
+import { useLanguage } from '../i18n'
 
 export default function Learn({ courses, user, login, myEnrollments, isAdmin }) {
+  const { t, localized } = useLanguage()
   const { courseId } = useParams()
   const [params, setParams] = useSearchParams()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -14,8 +17,6 @@ export default function Learn({ courses, user, login, myEnrollments, isAdmin }) 
   const { completedLessonIds, setLessonComplete } = useProgress(user, courseId)
 
   const enrollment = myEnrollments.find(e => e.courseId === courseId)
-  const hasAccess = isAdmin || enrollment?.status === 'approved'
-
   const currentLessonId = params.get('lesson') || flatLessons[0]?.id
   const currentIndex = flatLessons.findIndex(l => l.id === currentLessonId)
   const currentLesson = currentIndex >= 0 ? flatLessons[currentIndex] : null
@@ -26,7 +27,8 @@ export default function Learn({ courses, user, login, myEnrollments, isAdmin }) 
     }
   }, [flatLessons]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const pct = totalLessons > 0 ? Math.round((completedLessonIds.length / totalLessons) * 100) : 0
+  const isDemoLesson = currentLesson?.isDemo === true
+  const hasAccess = isAdmin || enrollment?.status === 'approved' || isDemoLesson
 
   const goToLesson = (id) => { setParams({ lesson: id }); setSidebarOpen(false) }
 
@@ -39,11 +41,11 @@ export default function Learn({ courses, user, login, myEnrollments, isAdmin }) 
     )
   }
 
-  if (!user) {
+  if (!user && !isDemoLesson) {
     return (
       <div className="container section">
-        <div className="note" style={{ marginBottom: 16 }}>এই কোর্সের লেসন দেখতে প্রথমে লগইন করুন।</div>
-        <button className="btn btn-primary" onClick={login}>Google দিয়ে লগইন</button>
+        <div className="note" style={{ marginBottom: 16 }}>{t('loginToWatch')}</div>
+        <button className="btn btn-primary" onClick={login}>{t('login')}</button>
       </div>
     )
   }
@@ -60,15 +62,17 @@ export default function Learn({ courses, user, login, myEnrollments, isAdmin }) 
   // Legacy fallback: course has no modules/lessons yet, just a single video field.
   if (!loading && totalLessons === 0) {
     const legacyVideoType = course.videoType === 'facebook' ? 'facebook' : 'youtube'
-    const legacyUrl = legacyVideoType === 'facebook' ? course.facebookUrl : course.videoid
+    const legacyVideo = legacyVideoType === 'facebook'
+      ? { url: course.facebookUrl }
+      : { videoId: extractYouTubeId(course.videoid) }
     return (
       <div className="container section" style={{ maxWidth: 900 }}>
         <Link to={`/course/${courseId}`} className="body" style={{ fontSize: 13, display: 'inline-block', marginBottom: 16 }}>← কোর্স ডিটেইলসে ফিরে যান</Link>
         <h1 className="h2" style={{ marginBottom: 16 }}>{course.title}</h1>
-        {legacyUrl ? (
+        {(legacyVideo.url || legacyVideo.videoId) ? (
           <div className="card">
             {course.islive && <span className="pill pill-live" style={{ marginBottom: 12, display: 'inline-block' }}>সরাসরি লাইভ চলছে</span>}
-            <VideoEmbed videoType={legacyVideoType} url={legacyUrl} title={course.title} autoplay={course.islive} />
+            <VideoEmbed videoType={legacyVideoType} url={legacyVideo.url} videoId={legacyVideo.videoId} title={course.title} autoplay={course.islive} />
           </div>
         ) : (
           <div className="note">এখনো কোনো ভিডিও/লেসন যোগ করা হয়নি।</div>
@@ -78,7 +82,10 @@ export default function Learn({ courses, user, login, myEnrollments, isAdmin }) 
   }
 
   const lessonVideoType = currentLesson?.videoType === 'facebook' ? 'facebook' : 'youtube'
-  const lessonVideoUrl = lessonVideoType === 'facebook' ? currentLesson?.facebookUrl : currentLesson?.youtubeUrl
+  const lessonVideoUrl = lessonVideoType === 'facebook' ? currentLesson?.facebookUrl : undefined
+  const lessonVideoId = lessonVideoType === 'youtube'
+    ? extractYouTubeId(currentLesson?.youtubeId || currentLesson?.youtubeUrl)
+    : undefined
   const isDone = currentLesson && completedLessonIds.includes(currentLesson.id)
   const prevLesson = currentIndex > 0 ? flatLessons[currentIndex - 1] : null
   const nextLesson = currentIndex >= 0 && currentIndex < flatLessons.length - 1 ? flatLessons[currentIndex + 1] : null
@@ -87,12 +94,18 @@ export default function Learn({ courses, user, login, myEnrollments, isAdmin }) 
     <div className="container section">
       <Link to={`/course/${courseId}`} className="body" style={{ fontSize: 13, display: 'inline-block', marginBottom: 16 }}>← কোর্স ডিটেইলসে ফিরে যান</Link>
 
-      <button className="btn btn-outline learn-collapsible-toggle" onClick={() => setSidebarOpen(o => !o)}>
+      <button
+        type="button"
+        className="btn btn-outline learn-collapsible-toggle"
+        aria-expanded={sidebarOpen}
+        aria-controls="course-playlist"
+        onClick={() => setSidebarOpen(o => !o)}
+      >
         কোর্স কনটেন্ট ({pct}% সম্পন্ন) {sidebarOpen ? '▲' : '▼'}
       </button>
 
       <div className="learn-layout">
-        <aside className="learn-sidebar" style={{ display: sidebarOpen ? 'block' : undefined }}>
+        <aside id="course-playlist" className={`learn-sidebar ${sidebarOpen ? 'open' : ''}`}>
           <h3 className="h3" style={{ marginBottom: 8 }}>{course.title}</h3>
           <div className="learn-progress-bar">
             <div className="learn-progress-fill" style={{ width: `${pct}%` }} />
@@ -128,7 +141,7 @@ export default function Learn({ courses, user, login, myEnrollments, isAdmin }) 
           {currentLesson ? (
             <>
               <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
-                <VideoEmbed videoType={lessonVideoType} url={lessonVideoUrl} title={currentLesson.title} />
+                <VideoEmbed videoType={lessonVideoType} url={lessonVideoUrl} videoId={lessonVideoId} title={currentLesson.title} />
               </div>
 
               <h2 className="h3" style={{ marginBottom: 8 }}>{currentLesson.title}</h2>

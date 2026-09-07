@@ -48,7 +48,12 @@ export function isLiveYouTubeUrl(input) {
 
 export function buildYouTubeEmbedUrl(videoId, { autoplay = false } = {}) {
   if (!videoId) return null
-  const params = new URLSearchParams({ rel: '0', modestbranding: '1' })
+  const params = new URLSearchParams({
+    controls: '1',
+    modestbranding: '1',
+    playsinline: '1',
+    rel: '0'
+  })
   if (autoplay) params.set('autoplay', '1')
   return `https://www.youtube.com/embed/${videoId}?${params.toString()}`
 }
