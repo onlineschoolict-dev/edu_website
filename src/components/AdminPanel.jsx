@@ -30,7 +30,7 @@ const NAV_ITEMS = [
 export default function AdminPanel({
   open, onClose, courses, addCourse, updateCourse, deleteCourse, enrollments,
   settings, updateSettings, uploadHeroImage,
-  liveClasses, addLiveClass, updateLiveClass, deleteLiveClass, loading = false
+  liveClasses, addLiveClass, updateLiveClass, deleteLiveClass, loading = false, routeMode = false
 }) {
   const { language, setLanguage, t } = useLanguage()
   const [tab, setTab] = useState('dashboard')
@@ -160,7 +160,21 @@ export default function AdminPanel({
   const sectionTitle = t(NAV_ITEMS.find(item => item.id === tab)?.key || 'dashboard')
 
   return (
-    <div className={`admin-drawer admin-drawer-wide ${open ? 'open' : ''}`}>
+    <div
+      className={`admin-drawer admin-drawer-wide ${open ? 'open' : ''}`}
+      style={routeMode ? {
+        position: 'relative',
+        top: 'auto',
+        right: 'auto',
+        width: '100%',
+        maxWidth: 'none',
+        height: '100vh',
+        maxHeight: 'none',
+        border: 0,
+        borderRadius: 0,
+        boxShadow: 'none'
+      } : undefined}
+    >
       <div className={`admin-shell ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <header className="admin-topbar">
           <button className="admin-menu-toggle" type="button" aria-label="মেনু খুলুন" onClick={() => setSidebarOpen(v => !v)}>☰</button>

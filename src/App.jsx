@@ -17,6 +17,7 @@ import { useLanguage } from './i18n'
 
 export default function App() {
   const { t } = useLanguage()
+  const navigate = useNavigate()
   const { user, login, logout, isAdmin, authError, loading: authLoading } = useAuth()
   const { courses, loading: coursesLoading, addCourse, updateCourse, deleteCourse } = useCourses()
   const myEnrollments = useMyEnrollments(user)
@@ -92,7 +93,7 @@ export default function App() {
               <AdminRoute loading={authLoading} user={user} isAdmin={isAdmin} login={login} authError={authError}>
                 <AdminPanel
                   open
-                  onClose={() => window.history.back()}
+                  onClose={() => navigate('/')}
                   courses={courses}
                   addCourse={addCourse}
                   updateCourse={updateCourse}
@@ -106,6 +107,7 @@ export default function App() {
                   updateLiveClass={updateLiveClass}
                   deleteLiveClass={deleteLiveClass}
                   loading={coursesLoading}
+                  routeMode
                 />
               </AdminRoute>
             }
