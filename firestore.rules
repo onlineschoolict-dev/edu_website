@@ -1,8 +1,5 @@
 rules_version = '2';
 
-// Replace this with the same address you set as VITE_ADMIN_EMAIL.
-// Firebase Auth verifies the email on Google sign-in, so a student cannot
-// spoof this value from the client.
 function isAdmin() {
   return request.auth != null && request.auth.token.email == 'onlineschoolict@gmail.com';
 }
@@ -10,8 +7,6 @@ function isAdmin() {
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Courses: public read (student site lists/plays only published ones
-    // client-side), write restricted to the admin.
     match /courses/{courseId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -27,34 +22,29 @@ service cloud.firestore {
       }
     }
 
-    // Enrollments: a student can create their own pending request and read
-    // only their own rows; only the admin can approve/reject (update) or
-    // read every enrollment.
     match /enrollments/{enrollmentId} {
-      allow read: if isAdmin() || (request.auth != null && resource.data.userId == request.auth.uid);
+      allow read: if isAdmin() || (request.auth != null && resource != null && resource.data.userId == request.auth.uid);
       allow create: if request.auth != null
                     && request.resource.data.userId == request.auth.uid
                     && request.resource.data.status == 'pending';
       allow update, delete: if isAdmin();
     }
 
-    // Lesson progress: a student may only read/write their own progress doc.
-    // Document id convention: {uid}_{courseId}
     match /progress/{progressId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null
+                  && resource != null
+                  && resource.data.userId == request.auth.uid;
       allow create, update: if request.auth != null
                              && request.resource.data.userId == request.auth.uid
                              && progressId == request.auth.uid + '_' + request.resource.data.courseId;
       allow delete: if false;
     }
 
-    // Site-wide settings (hero image, testimonials, feature flags).
     match /settings/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // YouTube Live announcements.
     match /liveClasses/{liveId} {
       allow read: if true;
       allow write: if isAdmin();
