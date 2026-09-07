@@ -72,7 +72,8 @@ export function useAuth() {
   }
 
   const logout = () => signOut(auth)
-  const isAdmin = !!user && user.email?.trim().toLowerCase() === ADMIN_EMAIL
+  const authenticatedEmail = auth.currentUser?.email
+  const isAdmin = !loading && !!user && authenticatedEmail?.trim().toLowerCase() === ADMIN_EMAIL
 
   return { user, loading, login, logout, isAdmin, authError }
 }

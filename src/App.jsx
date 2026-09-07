@@ -145,6 +145,10 @@ export default function App() {
     function AdminRoute({ loading, user, isAdmin, login, authError, children }) {
       const navigate = useNavigate()
 
+      useEffect(() => {
+        if (!loading && user && !isAdmin) navigate('/', { replace: true })
+      }, [loading, user, isAdmin, navigate])
+
       if (loading) return <div className="admin-auth-loading" role="status">অ্যাডমিন অ্যাক্সেস যাচাই হচ্ছে...</div>
 
       if (!user) {
@@ -158,12 +162,7 @@ export default function App() {
       }
 
       if (!isAdmin) {
-        return (
-          <div className="container section" style={{ maxWidth: 520, textAlign: 'center' }}>
-            <div className="note" style={{ marginBottom: 16 }}>এই account-এর Admin Panel access নেই।</div>
-            <button className="btn btn-outline" onClick={() => navigate('/')}>হোমে ফিরে যান</button>
-          </div>
-        )
+        return null
       }
 
       return children
