@@ -1,0 +1,112 @@
+import { useEffect, useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import AdminPanel from './components/AdminPanel'
+import Home from './pages/Home'
+import CourseDetail from './pages/CourseDetail'
+import MyCourses from './pages/MyCourses'
+import Learn from './pages/Learn'
+import { useAuth } from './hooks/useAuth'
+import { useCourses } from './hooks/useCourses'
+import { useMyEnrollments, useAllEnrollments } from './hooks/useEnrollments'
+import { useSiteSettings } from './hooks/useSiteSettings'
+import { useTheme } from './hooks/useTheme'
+import { useLiveClasses } from './hooks/useLiveClasses'
+
+export default function App() {
+  const { user, login, logout, isAdmin } = useAuth()
+  const { courses, loading: coursesLoading, addCourse, updateCourse, deleteCourse } = useCourses()
+  const myEnrollments = useMyEnrollments(user)
+  const allEnrollments = useAllEnrollments(isAdmin)
+  const { settings, updateSettings, uploadHeroImage } = useSiteSettings()
+  const { theme, toggleTheme } = useTheme()
+  const { liveClasses, addLiveClass, updateLiveClass, deleteLiveClass } = useLiveClasses()
+
+  const [adminOpen, setAdminOpen] = useState(false)
+  const [paymentStatus, setPaymentStatus] = useState(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const status = params.get('payment')
+    if (status) {
+      setPaymentStatus(status)
+      params.delete('payment')
+      params.delete('tran_id')
+      const rest = params.toString()
+      window.history.replaceState({}, '', window.location.pathname + (rest ? `?${rest}` : ''))
+    }
+  }, [])
+
+  return (
+    <>
+      {paymentStatus && (
+        <div className={`payment-banner payment-${paymentStatus}`}>
+          {paymentStatus === 'success' && '✅ পেমেন্ট সফল হয়েছে! কয়েক সেকেন্ডের মধ্যে কোর্স আনলক হয়ে যাবে।'}
+          {paymentStatus === 'fail' && '❌ পেমেন্ট ব্যর্থ হয়েছে। আবার চেষ্টা করুন বা ম্যানুয়াল bKash/Nagad ব্যবহার করুন।'}
+          {paymentStatus === 'cancel' && 'পেমেন্ট বাতিল করা হয়েছে।'}
+          <button className="payment-banner-close" onClick={() => setPaymentStatus(null)}>×</button>
+        </div>
+      )}
+      <Navbar
+        user={user}
+        isAdmin={isAdmin}
+        login={login}
+        logout={logout}
+        onOpenAdmin={() => setAdminOpen(true)}
+        siteName={settings.siteName}
+        theme={theme}
+        toggleTheme={toggleTheme}
+        courses={courses}
+      />
+
+      <main>
+        <Routes>
+          <Route path="/" element={<Home courses={courses} coursesLoading={coursesLoading} settings={settings} liveClasses={liveClasses} />} />
+          <Route
+            path="/course/:id"
+            element={
+              <CourseDetail
+                courses={courses}
+                user={user}
+                login={login}
+                myEnrollments={myEnrollments}
+                onlinePaymentEnabled={settings.onlinePaymentEnabled}
+              />
+            }
+          />
+          <Route path="/my-courses" element={<MyCourses courses={courses} user={user} myEnrollments={myEnrollments} login={login} />} />
+          <Route
+            path="/learn/:courseId"
+            element={<Learn courses={courses} user={user} login={login} myEnrollments={myEnrollments} isAdmin={isAdmin} />}
+          />
+        </Routes>
+      </main>
+
+      <footer>
+        <div className="container footer-inner">
+          <span>© {settings.siteName}</span>
+          {isAdmin && <button className="link-btn" onClick={() => setAdminOpen(true)}>অ্যাডমিন প্যানেল</button>}
+        </div>
+      </footer>
+
+      {isAdmin && (
+        <AdminPanel
+          open={adminOpen}
+          onClose={() => setAdminOpen(false)}
+          courses={courses}
+          addCourse={addCourse}
+          updateCourse={updateCourse}
+          deleteCourse={deleteCourse}
+          enrollments={allEnrollments}
+          settings={settings}
+          updateSettings={updateSettings}
+          uploadHeroImage={uploadHeroImage}
+          liveClasses={liveClasses}
+          addLiveClass={addLiveClass}
+          updateLiveClass={updateLiveClass}
+          deleteLiveClass={deleteLiveClass}
+        />
+      )}
+    </>
+  )
+}
