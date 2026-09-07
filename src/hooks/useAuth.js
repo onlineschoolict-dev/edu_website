@@ -5,6 +5,7 @@ import { auth, googleProvider, ADMIN_EMAIL } from '../firebase'
 export function useAuth() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [authError, setAuthError] = useState(null)
 
   useEffect(() => {
@@ -17,6 +18,8 @@ export function useAuth() {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u)
       setLoading(false)
+      const email = auth.currentUser?.email?.trim().toLowerCase()
+      setIsAdmin(!!u && email === ADMIN_EMAIL)
       if (u) setAuthError(null)
     }, (error) => {
       console.error('[Firebase Auth] Auth state error', {
@@ -25,6 +28,7 @@ export function useAuth() {
         error
       })
       setLoading(false)
+      setIsAdmin(false)
       setAuthError(error)
     })
     return unsub
@@ -72,8 +76,6 @@ export function useAuth() {
   }
 
   const logout = () => signOut(auth)
-  const authenticatedEmail = auth.currentUser?.email
-  const isAdmin = !loading && !!user && authenticatedEmail?.trim().toLowerCase() === ADMIN_EMAIL
 
   return { user, loading, login, logout, isAdmin, authError }
 }
