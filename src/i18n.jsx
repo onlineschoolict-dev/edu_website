@@ -12,7 +12,7 @@ export const translations = {
     noLessons: 'এখনো কোনো লেসন যোগ করা হয়নি', markComplete: 'সম্পন্ন হিসেবে চিহ্নিত করুন', completed: 'সম্পন্ন হিসেবে চিহ্নিত',
     previous: 'আগের লেসন', next: 'পরের লেসন', courseContent: 'কোর্স কনটেন্ট', completedPercent: 'সম্পন্ন',
     free: 'ফ্রি', paid: 'পেইড', demoOnly: 'ডেমো ক্লাস', homeCourses: 'সব কোর্স', learnToday: 'আজ শিখুন, আগামীকাল গড়ুন',
-    dashboard: 'ড্যাশবোর্ড', students: 'শিক্ষার্থী', videos: 'ভিডিও ম্যানেজমেন্ট', advertisements: 'বিজ্ঞাপন', settings: 'সেটিংস', live: 'লাইভ ক্লাস', courseDetails: 'বিস্তারিত দেখুন'
+    dashboard: 'ড্যাশবোর্ড', students: 'শিক্ষার্থী', videos: 'ভিডিও ম্যানেজমেন্ট', advertisements: 'বিজ্ঞাপন', reviews: 'রিভিউ', settings: 'সেটিংস', live: 'লাইভ ক্লাস', courseDetails: 'বিস্তারিত দেখুন'
   },
   en: {
     language: 'Language', home: 'Home', courses: 'Courses', teachers: 'Teachers', gallery: 'Gallery', contact: 'Contact',
@@ -23,7 +23,7 @@ export const translations = {
     noLessons: 'No lessons have been added yet', markComplete: 'Mark as complete', completed: 'Completed',
     previous: 'Previous lesson', next: 'Next lesson', courseContent: 'Course content', completedPercent: 'complete',
     free: 'Free', paid: 'Paid', demoOnly: 'Demo class', homeCourses: 'All courses', learnToday: 'Learn today, build tomorrow',
-    dashboard: 'Dashboard', students: 'Students', videos: 'Video management', advertisements: 'Advertisements', settings: 'Settings', live: 'Live classes', courseDetails: 'View details'
+    dashboard: 'Dashboard', students: 'Students', videos: 'Video management', advertisements: 'Advertisements', reviews: 'Reviews', settings: 'Settings', live: 'Live classes', courseDetails: 'View details'
   }
 }
 

@@ -12,6 +12,7 @@ import { useMyEnrollments, useAllEnrollments } from './hooks/useEnrollments'
 import { useSiteSettings } from './hooks/useSiteSettings'
 import { useTheme } from './hooks/useTheme'
 import { useLiveClasses } from './hooks/useLiveClasses'
+import { useReviews } from './hooks/useReviews'
 import AdBanner from './components/AdBanner'
 import { useLanguage } from './i18n'
 
@@ -25,6 +26,7 @@ export default function App() {
   const { settings, updateSettings, uploadHeroImage } = useSiteSettings()
   const { theme, toggleTheme } = useTheme()
   const { liveClasses, addLiveClass, updateLiveClass, deleteLiveClass } = useLiveClasses()
+  const { reviews } = useReviews()
 
   const [adminOpen, setAdminOpen] = useState(false)
   const [paymentStatus, setPaymentStatus] = useState(null)
@@ -67,7 +69,7 @@ export default function App() {
       <main>
         <AdBanner ads={settings.advertisements} adsEnabled={settings.adsEnabled !== false} position="homepage" />
         <Routes>
-          <Route path="/" element={<Home courses={courses} coursesLoading={coursesLoading} settings={settings} liveClasses={liveClasses} />} />
+          <Route path="/" element={<Home courses={courses} coursesLoading={coursesLoading} settings={settings} liveClasses={liveClasses} reviews={reviews} />} />
           <Route
             path="/course/:id"
             element={
@@ -85,7 +87,7 @@ export default function App() {
           <Route path="/my-courses" element={<MyCourses courses={courses} user={user} myEnrollments={myEnrollments} login={login} advertisements={settings.advertisements} adsEnabled={settings.adsEnabled !== false} />} />
           <Route
             path="/learn/:courseId"
-            element={<Learn courses={courses} user={user} login={login} myEnrollments={myEnrollments} isAdmin={isAdmin} />}
+            element={<Learn courses={courses} user={user} login={login} myEnrollments={myEnrollments} isAdmin={isAdmin} liveClasses={liveClasses} />}
           />
           <Route
             path="/admin"
@@ -99,6 +101,7 @@ export default function App() {
                   updateCourse={updateCourse}
                   deleteCourse={deleteCourse}
                   enrollments={allEnrollments}
+                  reviews={reviews}
                   settings={settings}
                   updateSettings={updateSettings}
                   uploadHeroImage={uploadHeroImage}
@@ -131,6 +134,7 @@ export default function App() {
           updateCourse={updateCourse}
           deleteCourse={deleteCourse}
           enrollments={allEnrollments}
+          reviews={reviews}
           settings={settings}
           updateSettings={updateSettings}
           uploadHeroImage={uploadHeroImage}

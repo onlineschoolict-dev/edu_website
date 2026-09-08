@@ -1,22 +1,36 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { requestEnrollment } from '../hooks/useEnrollments'
 import { useCurriculum } from '../hooks/useCurriculum'
 import CourseCurriculumPreview from '../components/CourseCurriculumPreview'
 import AdBanner from '../components/AdBanner'
 import { useLanguage } from '../i18n'
+import { saveReview, useReviews } from '../hooks/useReviews'
+import { Stars } from '../components/StudentReviews'
 
 export default function CourseDetail({ courses, user, login, myEnrollments, onlinePaymentEnabled, advertisements = [], adsEnabled = true }) {
   const { t, localized } = useLanguage()
   const { id } = useParams()
   const course = courses.find(c => c.id === id)
   const { modules, totalLessons } = useCurriculum(id)
+  const { reviews } = useReviews(id)
 
   const [method, setMethod] = useState('bkash')
   const [phone, setPhone] = useState('')
   const [txnId, setTxnId] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [payingOnline, setPayingOnline] = useState(false)
+  const [reviewRating, setReviewRating] = useState(5)
+  const [reviewComment, setReviewComment] = useState('')
+  const [reviewSubmitting, setReviewSubmitting] = useState(false)
+  const currentReview = reviews.find(review => review.userId === user?.uid)
+
+  useEffect(() => {
+    if (currentReview) {
+      setReviewRating(Number(currentReview.rating) || 5)
+      setReviewComment(currentReview.comment || '')
+    }
+  }, [currentReview?.id])
 
   const payOnline = async () => {
     setPayingOnline(true)
@@ -57,7 +71,24 @@ export default function CourseDetail({ courses, user, login, myEnrollments, onli
   }
 
   const enrollment = myEnrollments.find(e => e.courseId === course.id)
+  const approvedReviews = reviews.filter(review => review.status === 'approved')
+  const averageRating = approvedReviews.length
+    ? approvedReviews.reduce((total, review) => total + Number(review.rating || 0), 0) / approvedReviews.length
+    : 0
   const demoLessons = modules.flatMap(module => module.lessons.filter(lesson => lesson.isDemo === true))
+
+  const submitReview = async (event) => {
+    event.preventDefault()
+    if (!user) { login(); return }
+    if (!reviewComment.trim()) return
+    setReviewSubmitting(true)
+    try {
+      await saveReview({ id: currentReview?.id, courseId: course.id, user, rating: reviewRating, comment: reviewComment })
+      alert('রিভিউ জমা হয়েছে। অ্যাডমিন অনুমোদনের পর এটি দেখা যাবে।')
+    } finally {
+      setReviewSubmitting(false)
+    }
+  }
 
   const submit = async () => {
     if (!user) { login(); return }
@@ -120,6 +151,33 @@ export default function CourseDetail({ courses, user, login, myEnrollments, onli
           </div>
         </section>
       )}
+
+      <section className="card" style={{ margin: '20px 0' }}>
+        <div className="section-head" style={{ marginBottom: 12 }}>
+          <div>
+            <h3 className="h3" style={{ marginBottom: 5 }}>রিভিউ</h3>
+            {approvedReviews.length > 0 && <div className="body"><strong style={{ fontSize: 20 }}>{averageRating.toFixed(1)}</strong> <Stars value={Math.round(averageRating)} /> · {approvedReviews.length}টি রিভিউ</div>}
+          </div>
+        </div>
+        {approvedReviews.length > 0 && approvedReviews.map(review => (
+          <div key={review.id} style={{ padding: '12px 0', borderTop: '1px solid var(--border-hex)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}><strong>{review.userName || 'শিক্ষার্থী'}</strong><Stars value={Number(review.rating) || 0} /></div>
+            <p className="body" style={{ margin: '6px 0 0' }}>{review.comment}</p>
+          </div>
+        ))}
+        {enrollment?.status === 'approved' && user && (
+          <form onSubmit={submitReview} style={{ borderTop: '1px solid var(--border-hex)', marginTop: 12, paddingTop: 16 }}>
+            <h4 style={{ margin: '0 0 12px' }}>{currentReview ? 'আপনার রিভিউ এডিট করুন' : 'রিভিউ লিখুন'}</h4>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 12 }} aria-label="রেটিং নির্বাচন">
+              {[1, 2, 3, 4, 5].map(value => <button key={value} type="button" aria-label={`${value} star`} onClick={() => setReviewRating(value)} style={{ border: 0, background: 'transparent', color: value <= reviewRating ? '#f59e0b' : 'hsl(var(--muted-foreground))', fontSize: 22, cursor: 'pointer' }}>★</button>)}
+            </div>
+            <textarea className="input" rows={3} value={reviewComment} onChange={event => setReviewComment(event.target.value)} placeholder="আপনার অভিজ্ঞতা লিখুন" required />
+            <button className="btn btn-primary" type="submit" style={{ marginTop: 10 }} disabled={reviewSubmitting}>{reviewSubmitting ? 'জমা হচ্ছে...' : currentReview ? 'রিভিউ আপডেট করুন' : 'রিভিউ জমা দিন'}</button>
+            {currentReview?.status === 'pending' && <small className="body" style={{ display: 'block', marginTop: 8 }}>আপনার আগের রিভিউটি অনুমোদনের অপেক্ষায় আছে।</small>}
+          </form>
+        )}
+        {!user && <p className="body" style={{ margin: '12px 0 0' }}>রিভিউ দিতে কোর্সে ভর্তি হয়ে লগইন করুন।</p>}
+      </section>
 
       {enrollment?.status === 'approved' ? (
         <div className="card" style={{ marginBottom: 20 }}>

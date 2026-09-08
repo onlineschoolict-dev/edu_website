@@ -5,6 +5,7 @@ import CurriculumManager from './admin/CurriculumManager'
 import LiveClassManager from './admin/LiveClassManager'
 import TestimonialsEditor from './admin/TestimonialsEditor'
 import AdvertisementManager from './admin/AdvertisementManager'
+import ReviewsManager from './admin/ReviewsManager'
 import { useLanguage } from '../i18n'
 import '../admin.css'
 
@@ -23,12 +24,13 @@ const NAV_ITEMS = [
   { id: 'lessons', key: 'lessons', icon: '≡' },
   { id: 'videos', key: 'videos', icon: '▶' },
   { id: 'advertisements', key: 'advertisements', icon: '▱' },
+  { id: 'reviews', key: 'reviews', icon: '★' },
   { id: 'settings', key: 'settings', icon: '⚙' },
   { id: 'live', key: 'live', icon: '◉' }
 ]
 
 export default function AdminPanel({
-  open, onClose, courses, addCourse, updateCourse, deleteCourse, enrollments,
+  open, onClose, courses, addCourse, updateCourse, deleteCourse, enrollments, reviews = [],
   settings, updateSettings, uploadHeroImage,
   liveClasses, addLiveClass, updateLiveClass, deleteLiveClass, loading = false, routeMode = false
 }) {
@@ -299,6 +301,8 @@ export default function AdminPanel({
       )}
 
       {tab === 'advertisements' && <AdvertisementManager advertisements={settings?.advertisements || []} updateSettings={updateSettings} />}
+
+      {tab === 'reviews' && <ReviewsManager reviews={reviews} courses={courses} notify={notify} />}
 
       {(tab === 'students') && (
         <div>

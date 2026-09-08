@@ -8,6 +8,7 @@ import { useCourses } from './hooks/useCourses'
 import { useAllEnrollments } from './hooks/useEnrollments'
 import { useSiteSettings } from './hooks/useSiteSettings'
 import { useLiveClasses } from './hooks/useLiveClasses'
+import { useReviews } from './hooks/useReviews'
 
 export default function AdminApp() {
   const { user, login, logout, isAdmin, loading, authError } = useAuth()
@@ -15,6 +16,7 @@ export default function AdminApp() {
   const allEnrollments = useAllEnrollments(isAdmin)
   const { settings, updateSettings, uploadHeroImage } = useSiteSettings()
   const { liveClasses, addLiveClass, updateLiveClass, deleteLiveClass } = useLiveClasses()
+  const { reviews } = useReviews()
 
   if (loading) {
     return <div className="admin-auth-loading" role="status">অ্যাডমিন প্যানেল লোড হচ্ছে...</div>
@@ -53,6 +55,7 @@ export default function AdminApp() {
         updateCourse={updateCourse}
         deleteCourse={deleteCourse}
         enrollments={allEnrollments}
+        reviews={reviews}
         settings={settings}
         updateSettings={updateSettings}
         uploadHeroImage={uploadHeroImage}

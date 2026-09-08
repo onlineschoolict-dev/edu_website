@@ -502,6 +502,17 @@ footer{border-top:1px solid var(--border-hex);padding:24px 0;color:hsl(var(--mut
 .learn-lesson-item.active{background:hsl(var(--secondary));font-weight:600;}
 .learn-lesson-item.done .learn-lesson-icon{color:#22c55e;}
 .learn-lesson-icon{width:16px;flex-shrink:0;text-align:center;}
+
+.live-comments{margin-top:20px;}
+.live-comments-list{display:grid;gap:10px;max-height:280px;overflow-y:auto;padding:4px 2px 12px;}
+.live-comment{display:flex;align-items:flex-start;gap:9px;min-width:0;}
+.live-comment-avatar{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:50%;background:hsl(var(--secondary));color:hsl(var(--ring));font-size:12px;font-weight:700;}
+.live-comment-content{min-width:0;flex:1;}
+.live-comment-content strong{display:block;font-size:12px;}
+.live-comment-content p{margin:2px 0 0;font-size:13px;overflow-wrap:anywhere;}
+.live-comment-delete{border:0;background:transparent;color:hsl(var(--muted-foreground));font-size:18px;cursor:pointer;padding:0 4px;}
+.live-comments-form{display:flex;gap:8px;border-top:1px solid var(--border-hex);padding-top:12px;}
+.live-comments-form .input{min-width:0;flex:1;}
 .learn-main{min-width:0;}
 .learn-nav-buttons{display:flex;justify-content:space-between;gap:10px;margin-top:16px;}
 .learn-collapsible-toggle{display:none;}
@@ -524,6 +535,8 @@ footer{border-top:1px solid var(--border-hex);padding:24px 0;color:hsl(var(--mut
   .learn-main .card{border-radius:8px;}
   .learn-nav-buttons{flex-direction:column;}
   .learn-nav-buttons .btn{width:100%;}
+  .live-comments-form{align-items:stretch;flex-direction:column;}
+  .live-comments-form .btn{width:100%;}
 }
 
 /* ---------- admin tabs ---------- */

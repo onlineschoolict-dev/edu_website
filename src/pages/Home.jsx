@@ -6,12 +6,13 @@ import CourseGrid from '../components/CourseGrid'
 import FeaturedCarousel from '../components/FeaturedCarousel'
 import LiveBanner from '../components/LiveBanner'
 import Testimonials from '../components/Testimonials'
+import StudentReviews from '../components/StudentReviews'
 
 // A course with no `published` field yet (older documents) is treated as published,
 // so nothing that's already live disappears after this update.
 const isPublished = (c) => c.published !== false
 
-export default function Home({ courses, coursesLoading = false, settings, liveClasses = [] }) {
+export default function Home({ courses, coursesLoading = false, settings, liveClasses = [], reviews = [] }) {
   const [filter, setFilter] = useState('সব')
 
   const publishedCourses = useMemo(() => courses.filter(isPublished), [courses])
@@ -46,6 +47,7 @@ export default function Home({ courses, coursesLoading = false, settings, liveCl
         <CourseGrid courses={publishedCourses} filter={filter} loading={coursesLoading} />
       </div>
       <Testimonials testimonials={settings?.testimonials || []} />
+      <StudentReviews reviews={reviews} compact />
       <section className="container section closing-cta" id="contact">
         <div>
           <span className="eyebrow">READY WHEN YOU ARE</span>

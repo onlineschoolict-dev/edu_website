@@ -5,16 +5,19 @@ import { useProgress } from '../hooks/useProgress'
 import VideoEmbed from '../components/VideoEmbed'
 import { extractYouTubeId } from '../utils/youtube'
 import { useLanguage } from '../i18n'
+import LiveComments from '../components/LiveComments'
 
-export default function Learn({ courses, user, login, myEnrollments, isAdmin }) {
+export default function Learn({ courses, user, login, myEnrollments, isAdmin, liveClasses = [] }) {
   const { t, localized } = useLanguage()
   const { courseId } = useParams()
   const [params, setParams] = useSearchParams()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const course = courses.find(c => c.id === courseId)
+  const liveClass = liveClasses.find(item => item.status === 'live' && (!item.courseId || item.courseId === courseId))
   const { modules, totalLessons, flatLessons, loading } = useCurriculum(courseId)
   const { completedLessonIds, setLessonComplete } = useProgress(user, courseId)
+  const pct = totalLessons ? Math.round((completedLessonIds.length / totalLessons) * 100) : 0
 
   const enrollment = myEnrollments.find(e => e.courseId === courseId)
   const currentLessonId = params.get('lesson') || flatLessons[0]?.id
@@ -77,6 +80,7 @@ export default function Learn({ courses, user, login, myEnrollments, isAdmin }) 
         ) : (
           <div className="note">এখনো কোনো ভিডিও/লেসন যোগ করা হয়নি।</div>
         )}
+        <LiveComments liveClass={liveClass} user={user} login={login} isAdmin={isAdmin} />
       </div>
     )
   }
@@ -162,6 +166,7 @@ export default function Learn({ courses, user, login, myEnrollments, isAdmin }) 
                   পরের লেসন →
                 </button>
               </div>
+              <LiveComments liveClass={liveClass} user={user} login={login} isAdmin={isAdmin} />
             </>
           ) : (
             <div className="note">লেসন লোড হচ্ছে...</div>
