@@ -73,8 +73,8 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
           <button className="theme-toggle" aria-label="থিম পরিবর্তন করুন" onClick={toggleTheme}>
             <ThemeIcon />
           </button>
-          {isAdmin && (
-            <button className="btn btn-outline" onClick={onOpenAdmin}>{t('admin')}</button>
+          {user && (
+            <Link className="btn btn-outline" to="/admin">{t('admin')}</Link>
           )}
           {user ? (
             <>
@@ -126,10 +126,10 @@ export default function Navbar({ user, isAdmin, login, logout, onOpenAdmin, site
               ))}
             </div>
           )}
-          {isAdmin && (
-            <button className="btn btn-outline" style={{ width: '100%', marginBottom: 8 }} onClick={() => { onOpenAdmin(); setMenuOpen(false) }}>
+          {user && (
+            <Link className="btn btn-outline" style={{ width: '100%', marginBottom: 8, display: 'block', textAlign: 'center' }} to="/admin" onClick={() => setMenuOpen(false)}>
               {t('admin')}
-            </button>
+            </Link>
           )}
           {user ? (
             <>

@@ -151,10 +151,6 @@ export default function App() {
     function AdminRoute({ loading, user, isAdmin, login, authError, children }) {
       const navigate = useNavigate()
 
-      useEffect(() => {
-        if (!loading && user && !isAdmin) navigate('/', { replace: true })
-      }, [loading, user, isAdmin, navigate])
-
       if (loading) return <div className="admin-auth-loading" role="status">অ্যাডমিন অ্যাক্সেস যাচাই হচ্ছে...</div>
 
       if (!user) {
@@ -168,7 +164,11 @@ export default function App() {
       }
 
       if (!isAdmin) {
-        return null
+        return (
+          <div className="container section" style={{ maxWidth: 520, textAlign: 'center' }}>
+            <div className="note">এই অ্যাকাউন্টের ({user.email}) অ্যাডমিন অ্যাক্সেস নেই। `VITE_ADMIN_EMAIL`-এ নির্ধারিত Google অ্যাকাউন্ট দিয়ে লগইন করুন।</div>
+          </div>
+        )
       }
 
       return children

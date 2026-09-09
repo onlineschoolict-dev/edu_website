@@ -18,7 +18,7 @@ export function useAuth() {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u)
       setLoading(false)
-      const email = auth.currentUser?.email?.trim().toLowerCase()
+      const email = u?.email?.trim().toLowerCase()
       setIsAdmin(!!u && email === ADMIN_EMAIL)
       if (u) setAuthError(null)
     }, (error) => {
